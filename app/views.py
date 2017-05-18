@@ -14,7 +14,7 @@ def register():
 @app.route('/addname', methods = ['POST', 'GET'])
 def addname():
     form = request.form
-    with open('names.csv', 'w') as f:
+    with open('names.csv', 'a') as f:
         f.write(str(form['name'])+'\n')
     return "Thanks for registering!"
 
@@ -26,8 +26,14 @@ def groups():
         for line in f:
             names.append(line.strip())
     shuffle(names)
-    groups = [[names[x], names[x+1], names[x+2]] for x in [y * 3 for y in range(len(names) / 3)]]
+    groups = [[names[x], names[x + 1], names[x + 2]] for x in [y * 3 for y in range(len(names) / 3)]]
     numstragglers = len(names) % 3
-    print names[len(names)-numstragglers:]
-    groups[-1] = groups[-1] + names[len(names)-numstragglers:]
-    return "<div>Here are the groups for today, built from the following people: " + str(names) + ": " + str(len(names)) + " people.</div> <div>" + str(groups) + "</div>"
+    print names[len(names) - numstragglers:]
+    if groups:
+        groups[-1] = groups[-1] + names[len(names) - numstragglers:]
+    else:
+        groups = [names[len(names) - numstragglers:]]
+    retval = "<div>Here are the groups for today, built from the following people: " + str(names) + "(" + str(len(names)) + " people.)</div>"
+    for i in range(len(groups)):
+        retval += "<div> <h3> Group %d </h3> %s </div>" % (i + 1, ",".join(groups[i]))
+    return retval
